@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025. JerryHan3.
+ * Copyright (c) 2025-2026. JerryHan3.
  *
  * This is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -16,7 +16,7 @@
  * and navigate to version 3 of the GNU Affero General Public License.
  */
 
-package org.moc.statCleaner.utils;
+package me.jerryhan3.statCleaner.utils;
 
 import org.bukkit.attribute.Attribute;
 

@@ -16,7 +16,7 @@
  * and navigate to version 3 of the GNU Affero General Public License.
  */
 
-package org.moc.statCleaner.command;
+package me.jerryhan3.statCleaner.command;
 
 import org.bukkit.attribute.Attributable;
 import org.bukkit.attribute.Attribute;
@@ -27,15 +27,15 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
-import org.moc.statCleaner.StatCleaner;
-import org.moc.statCleaner.utils.SelectorParser;
+import me.jerryhan3.statCleaner.StatCleaner;
+import me.jerryhan3.statCleaner.utils.SelectorParser;
 
 import java.util.*;
 import java.util.logging.Level;
 
-import static org.moc.statCleaner.utils.AttributeList.default_pre_21_3;
-import static org.moc.statCleaner.utils.AttributeList.default_after_21_3;
-import static org.moc.statCleaner.utils.VersionDetector.isVersionAtLeast;
+import static me.jerryhan3.statCleaner.utils.AttributeList.default_pre_21_3;
+import static me.jerryhan3.statCleaner.utils.AttributeList.default_after_21_3;
+import static me.jerryhan3.statCleaner.utils.VersionDetector.isVersionAtLeast;
 
 public class CommandReset implements CommandExecutor {
     private final StatCleaner parent;

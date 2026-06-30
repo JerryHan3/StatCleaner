@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025. JerryHan3.
+ * Copyright (c) 2025-2026. JerryHan3. 
  *
  * This is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -16,14 +16,14 @@
  * and navigate to version 3 of the GNU Affero General Public License.
  */
 
-package org.moc.statCleaner;
+package me.jerryhan3.statCleaner;
 
 import org.bukkit.plugin.java.JavaPlugin;
-import org.moc.statCleaner.command.CommandMain;
-import org.moc.statCleaner.command.CommandReset;
-import org.moc.statCleaner.command.TabCompleter.TabMain;
-import org.moc.statCleaner.command.TabCompleter.TabReset;
-import org.moc.statCleaner.utils.VersionDetector;
+import me.jerryhan3.statCleaner.command.CommandMain;
+import me.jerryhan3.statCleaner.command.CommandReset;
+import me.jerryhan3.statCleaner.command.TabCompleter.TabMain;
+import me.jerryhan3.statCleaner.command.TabCompleter.TabReset;
+import me.jerryhan3.statCleaner.utils.VersionDetector;
 
 import java.util.Objects;
 

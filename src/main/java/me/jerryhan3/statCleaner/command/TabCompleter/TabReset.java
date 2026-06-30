@@ -1,4 +1,4 @@
-package org.moc.statCleaner.command.TabCompleter;
+package me.jerryhan3.statCleaner.command.TabCompleter;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;

@@ -16,12 +16,12 @@
  * and navigate to version 3 of the GNU Affero General Public License.
  */
 
-package org.moc.statCleaner.command;
+package me.jerryhan3.statCleaner.command;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.moc.statCleaner.StatCleaner;
+import me.jerryhan3.statCleaner.StatCleaner;
 
 public class CommandMain implements CommandExecutor {
     private final StatCleaner parent;
