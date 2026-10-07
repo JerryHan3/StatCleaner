@@ -16,7 +16,7 @@
  * and navigate to version 3 of the GNU Affero General Public License.
  */
 
-package me.jerryhan3.statCleaner.utils;
+package me.jerryhan3.statCleaner.internal.utils;
 
 import java.util.HashMap;
 import java.util.Map;

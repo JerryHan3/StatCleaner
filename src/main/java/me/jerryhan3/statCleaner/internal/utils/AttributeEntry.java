@@ -16,7 +16,7 @@
  * and navigate to version 3 of the GNU Affero General Public License.
  */
 
-package me.jerryhan3.statCleaner.utils;
+package me.jerryhan3.statCleaner.internal.utils;
 
 import org.bukkit.attribute.Attribute;
 
@@ -45,7 +45,7 @@ public class AttributeEntry {
     }
 
     public boolean is_valid() {
-        return VersionDetector.isVersionAtLeast(start_ver, start_ver_minor) && (!is_deprecated || VersionDetector.getMajorVersion() <= end_ver);
+        return VersionDetector.isVersionAtLeastLegacy(start_ver, start_ver_minor) && (!is_deprecated || VersionDetector.getMinorVersion() <= end_ver);
     }
 }
 

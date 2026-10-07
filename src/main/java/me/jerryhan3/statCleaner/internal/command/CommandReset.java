@@ -16,8 +16,9 @@
  * and navigate to version 3 of the GNU Affero General Public License.
  */
 
-package me.jerryhan3.statCleaner.command;
+package me.jerryhan3.statCleaner.internal.command;
 
+import me.jerryhan3.statCleaner.internal.utils.VersionDetector;
 import org.bukkit.attribute.Attributable;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
@@ -27,15 +28,15 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
-import me.jerryhan3.statCleaner.StatCleaner;
-import me.jerryhan3.statCleaner.utils.SelectorParser;
+import me.jerryhan3.statCleaner.internal.StatCleaner;
+import me.jerryhan3.statCleaner.internal.utils.SelectorParser;
 
 import java.util.*;
 import java.util.logging.Level;
 
-import static me.jerryhan3.statCleaner.utils.AttributeList.default_pre_21_3;
-import static me.jerryhan3.statCleaner.utils.AttributeList.default_after_21_3;
-import static me.jerryhan3.statCleaner.utils.VersionDetector.isVersionAtLeast;
+import static me.jerryhan3.statCleaner.internal.utils.AttributeList.default_pre_21_3;
+import static me.jerryhan3.statCleaner.internal.utils.AttributeList.default_after_21_3;
+import static me.jerryhan3.statCleaner.internal.utils.VersionDetector.isVersionAtLeastLegacy;
 
 public class CommandReset implements CommandExecutor {
     private final StatCleaner parent;
@@ -107,7 +108,7 @@ public class CommandReset implements CommandExecutor {
         // Reset health
         if (isHealthEnabled)
         {
-            if (isVersionAtLeast(9)) {
+            if (VersionDetector.isVersionAtLeastLegacy(9)) {
                 AttributeInstance targetMaxHealth = target.getAttribute(Attribute.GENERIC_MAX_HEALTH);
                 if (targetMaxHealth != null) {
                     targetMaxHealth.setBaseValue(20);
@@ -129,7 +130,7 @@ public class CommandReset implements CommandExecutor {
         if (isFoodEnabled)
         {
             target.setFoodLevel(20);
-            if (isVersionAtLeast(8)) {
+            if (VersionDetector.isVersionAtLeastLegacy(8)) {
                 target.setSaturation(5.0f);
             }
             else {
@@ -151,9 +152,9 @@ public class CommandReset implements CommandExecutor {
         // Reset all attributes
         if (isAttributeEnabled)
         {
-            if (isVersionAtLeast(9)) {
+            if (VersionDetector.isVersionAtLeastLegacy(9)) {
                 Map<String, Double> defaults = new HashMap<>(default_pre_21_3);
-                if (isVersionAtLeast(21, 3)) {
+                if (isVersionAtLeastLegacy(21, 3)) {
                     defaults = new HashMap<>(default_after_21_3);
                 }
                 int fail_count = 0;

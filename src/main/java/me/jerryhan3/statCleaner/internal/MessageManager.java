@@ -16,7 +16,7 @@
  * and navigate to version 3 of the GNU Affero General Public License.
  */
 
-package me.jerryhan3.statCleaner;
+package me.jerryhan3.statCleaner.internal;
 
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.YamlConfiguration;

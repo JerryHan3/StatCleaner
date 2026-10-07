@@ -16,18 +16,20 @@
  * and navigate to version 3 of the GNU Affero General Public License.
  */
 
-package me.jerryhan3.statCleaner;
+package me.jerryhan3.statCleaner.internal;
 
+import me.jerryhan3.statCleaner.api.StatCleanerApi;
 import org.bukkit.plugin.java.JavaPlugin;
-import me.jerryhan3.statCleaner.command.CommandMain;
-import me.jerryhan3.statCleaner.command.CommandReset;
-import me.jerryhan3.statCleaner.command.TabCompleter.TabMain;
-import me.jerryhan3.statCleaner.command.TabCompleter.TabReset;
-import me.jerryhan3.statCleaner.utils.VersionDetector;
+import me.jerryhan3.statCleaner.internal.command.CommandMain;
+import me.jerryhan3.statCleaner.internal.command.CommandReset;
+import me.jerryhan3.statCleaner.internal.command.TabCompleter.TabMain;
+import me.jerryhan3.statCleaner.internal.command.TabCompleter.TabReset;
+import me.jerryhan3.statCleaner.internal.utils.VersionDetector;
 
 import java.util.Objects;
 
 public final class StatCleaner extends JavaPlugin {
+    private StatCleanerApi api;
     private MessageManager messageManager;
 
     @Override
@@ -49,7 +51,7 @@ public final class StatCleaner extends JavaPlugin {
         // Complete log
         getLogger().info("StatCleaner " + getDescription().getVersion() + " has been successfully loaded!");
         // Version warning
-        if (!VersionDetector.isVersionAtLeast(9)) getLogger().warning("You are using a version that hasn't be fully supported yet. Some stats like saturation or attributes will be skipped!");
+        if (!VersionDetector.isVersionAtLeastLegacy(9)) getLogger().warning("You are using a version that hasn't be fully supported yet. Some stats like saturation or attributes will be skipped!");
     }
 
     @Override

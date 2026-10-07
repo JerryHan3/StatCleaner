@@ -16,7 +16,7 @@
  * and navigate to version 3 of the GNU Affero General Public License.
  */
 
-package me.jerryhan3.statCleaner.utils;
+package me.jerryhan3.statCleaner.internal.utils;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -28,7 +28,6 @@ import java.util.Collections;
 import java.util.List;
 
 public class SelectorParser {
-
     public static List<Player> parsePlayers(CommandSender sender, String selector) throws IllegalArgumentException {
         if (selector == null || selector.isEmpty()) {
             return Collections.emptyList();
