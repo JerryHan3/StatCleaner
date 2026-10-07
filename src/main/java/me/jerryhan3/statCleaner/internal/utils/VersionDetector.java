@@ -18,6 +18,7 @@
 
 package me.jerryhan3.statCleaner.internal.utils;
 
+import me.jerryhan3.statCleaner.api.VersionHelper;
 import org.bukkit.Bukkit;
 
 public class VersionDetector {
@@ -97,5 +98,32 @@ public class VersionDetector {
         String[] parts = version.split("\\.");
         if (parts[2] == null) return 0;
         return Integer.parseInt(parts[2]);
+    }
+
+    private static final class VersionHelperImpl implements VersionHelper {
+        @Override
+        public boolean isVersionAtLeast(int major, int minor) {
+            return VersionDetector.isVersionAtLeast(major, minor);
+        }
+
+        @Override
+        public boolean isVersionAtLeast(int major, int minor, int fix) {
+            return VersionDetector.isVersionAtLeast(major, minor, fix);
+        }
+
+        @Override
+        public int getMajorVersion() {
+            return VersionDetector.getMajorVersion();
+        }
+
+        @Override
+        public int getMinorVersion() {
+            return VersionDetector.getMinorVersion();
+        }
+
+        @Override
+        public int getFixVersion() {
+            return VersionDetector.getFixVersion();
+        }
     }
 }
