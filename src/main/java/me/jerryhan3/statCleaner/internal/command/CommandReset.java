@@ -36,6 +36,7 @@ import java.util.logging.Level;
 
 import static me.jerryhan3.statCleaner.internal.utils.AttributeList.default_pre_21_3;
 import static me.jerryhan3.statCleaner.internal.utils.AttributeList.default_after_21_3;
+import static me.jerryhan3.statCleaner.internal.utils.VersionDetector.isVersionAtLeast;
 import static me.jerryhan3.statCleaner.internal.utils.VersionDetector.isVersionAtLeastLegacy;
 
 public class CommandReset implements CommandExecutor {
@@ -106,67 +107,19 @@ public class CommandReset implements CommandExecutor {
         boolean isPartialFailed = false;
 
         // Reset health
-        if (isHealthEnabled)
-        {
-            if (VersionDetector.isVersionAtLeastLegacy(9)) {
-                AttributeInstance targetMaxHealth = target.getAttribute(Attribute.GENERIC_MAX_HEALTH);
-                if (targetMaxHealth != null) {
-                    targetMaxHealth.setBaseValue(20);
-                    target.setHealth(targetMaxHealth.getValue());
-                } else {
-                    throw new RuntimeException("Can't get player's max health!");
-                }
-            }
-            else {
-                // 1.8 回退机制
-                try {
-                    target.setMaxHealth(20);
-                } catch (NoSuchMethodError ignored) {}
-                target.setHealth(target.getMaxHealth());
-            }
-        }
+        if (isHealthEnabled) resetHealth(target);
 
         // Reset food
-        if (isFoodEnabled)
-        {
-            target.setFoodLevel(20);
-            if (VersionDetector.isVersionAtLeastLegacy(8)) {
-                target.setSaturation(5.0f);
-            }
-            else {
-                // TODO: 在1.8以下恢复饱和度
-                parent.getLogger().warning("Can't recover saturation on version below 1.8 yet!");
-                isPartialFailed = true;
-            }
-        }
+        if (isFoodEnabled) isPartialFailed = !resetHunger(target);
 
         // Clear potion effects
-        if (isEffectEnabled)
-        {
-            Collection<PotionEffect> active_effects = target.getActivePotionEffects();
-            for (PotionEffect effect : active_effects) {
-                target.removePotionEffect(effect.getType());
-            }
-        }
+        if (isEffectEnabled) clearEffects(target);
 
         // Reset all attributes
         if (isAttributeEnabled)
         {
-            if (VersionDetector.isVersionAtLeastLegacy(9)) {
-                Map<String, Double> defaults = new HashMap<>(default_pre_21_3);
-                if (isVersionAtLeastLegacy(21, 3)) {
-                    defaults = new HashMap<>(default_after_21_3);
-                }
-                int fail_count = 0;
-                for (Map.Entry<String, Double> entry : defaults.entrySet()) {
-                    try {
-                        setAttribute(target, entry.getKey(), entry.getValue());
-                    }
-                    catch (IllegalArgumentException ignored) {
-                        fail_count++;
-                    }
-                }
-                if (fail_count > 0 ) parent.getLogger().info(fail_count + "attribute(s) doesn't exist on current version. Ignored.");
+            if (VersionDetector.isVersionAtLeast(1,9)) {
+                resetAttributes(target);
             }
             else {
                 // TODO: 在1.9以下恢复属性
@@ -176,14 +129,75 @@ public class CommandReset implements CommandExecutor {
         }
 
         // Stop flying
-        if (isFlyEnabled)
-        {
-            target.setAllowFlight(false);
-            target.setFlying(false);
-        }
+        if (isFlyEnabled) stopFlying(target);
 
         target.saveData();
         return isPartialFailed;
+    }
+
+    private void resetHealth(Player target) {
+        if (isVersionAtLeast(1,9)) {
+            AttributeInstance targetMaxHealth = target.getAttribute(Attribute.GENERIC_MAX_HEALTH);
+            if (targetMaxHealth != null) {
+                targetMaxHealth.setBaseValue(20);
+                target.setHealth(targetMaxHealth.getValue());
+            } else {
+                throw new RuntimeException("Can't get player's max health!");
+            }
+        }
+        else {
+            // 1.8 回退机制
+            try {
+                target.setMaxHealth(20);
+            } catch (NoSuchMethodError ignored) {}
+            target.setHealth(target.getMaxHealth());
+        }
+    }
+
+    /**
+     * Reset hunger to 20 and saturation to 5. <br>
+     * Notice: Saturation restore is not implemented yet on 1.8 and below.
+     * @param target Target player
+     * @return true if both stat recovered, false if saturation restore is skipped on unsupported version.
+     */
+    private boolean resetHunger(Player target) {
+        target.setFoodLevel(20);
+        if (isVersionAtLeast(1,8)) {
+            target.setSaturation(5.0f);
+            return true;
+        }
+        // TODO: 在1.8以下恢复饱和度
+        parent.getLogger().warning("Can't recover saturation on version below 1.8 yet!");
+        return false;
+    }
+
+    private void clearEffects(Player target) {
+        Collection<PotionEffect> active_effects = target.getActivePotionEffects();
+        for (PotionEffect effect : active_effects) {
+            target.removePotionEffect(effect.getType());
+        }
+    }
+
+    private void resetAttributes(Player target) {
+        Map<String, Double> defaults = new HashMap<>(default_pre_21_3);
+        if (isVersionAtLeast(1, 21, 3)) {
+            defaults = new HashMap<>(default_after_21_3);
+        }
+        int fail_count = 0;
+        for (Map.Entry<String, Double> entry : defaults.entrySet()) {
+            try {
+                setAttribute(target, entry.getKey(), entry.getValue());
+            }
+            catch (IllegalArgumentException ignored) {
+                fail_count++;
+            }
+        }
+        if (fail_count > 0 ) parent.getLogger().info(fail_count + "attribute(s) doesn't exist on current version. Ignored.");
+    }
+
+    private void stopFlying(Player target) {
+        target.setAllowFlight(false);
+        target.setFlying(false);
     }
 
     /**
