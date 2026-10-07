@@ -19,6 +19,8 @@
 package me.jerryhan3.statCleaner.internal;
 
 import me.jerryhan3.statCleaner.api.StatCleanerApi;
+import me.jerryhan3.statCleaner.api.provider.StatCleanerProvider;
+import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 import me.jerryhan3.statCleaner.internal.command.CommandMain;
 import me.jerryhan3.statCleaner.internal.command.CommandReset;
@@ -31,6 +33,7 @@ import java.util.Objects;
 public final class StatCleaner extends JavaPlugin {
     private StatCleanerApi api;
     private MessageManager messageManager;
+    private CommandReset commandReset;
 
     @Override
     public void onEnable() {
@@ -43,15 +46,21 @@ public final class StatCleaner extends JavaPlugin {
             }
         }
         messageManager = new MessageManager(this);
+        commandReset = new CommandReset(this);
         // Command
-        Objects.requireNonNull(this.getCommand("statreset")).setExecutor(new CommandReset(this));
+        Objects.requireNonNull(this.getCommand("statreset")).setExecutor(commandReset);
         Objects.requireNonNull(this.getCommand("statreset")).setTabCompleter(new TabReset());
         Objects.requireNonNull(this.getCommand("statcleaner")).setExecutor(new CommandMain(this));
         Objects.requireNonNull(this.getCommand("statcleaner")).setTabCompleter(new TabMain());
         // Complete log
         getLogger().info("StatCleaner " + getDescription().getVersion() + " has been successfully loaded!");
         // Version warning
-        if (!VersionDetector.isVersionAtLeastLegacy(9)) getLogger().warning("You are using a version that hasn't be fully supported yet. Some stats like saturation or attributes will be skipped!");
+        if (!VersionDetector.isVersionAtLeast(1,9)) getLogger().warning("You are using a version that hasn't be fully supported yet. Some stats like saturation or attributes will be skipped!");
+
+        // Start API
+        this.api = commandReset.statCleanerApi;
+        getServer().getServicesManager().register(StatCleanerApi.class, api, this, ServicePriority.Normal);
+        StatCleanerProvider.register(api);
     }
 
     @Override

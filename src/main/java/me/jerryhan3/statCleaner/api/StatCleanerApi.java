@@ -22,9 +22,11 @@ public interface StatCleanerApi {
 
     /**
      * Reset players' stats if they match the entity selector provided.
-     * @param sender Command sender, which will work together with entity selector to parse targets.
+     *
+     * @param sender   Command sender, which will work together with entity selector to parse targets.
      * @param selector a string that contains a vanilla entity selector, like <code>@a</code>.
-     * @throws IllegalArgumentException if the selector is malformed in any way or a parameter is null. Check javadoc for <code>org.bukkit.Bukkit.selectEntities</code> for more detail.
+     * @throws IllegalArgumentException if the selector is malformed in any way or a parameter is null.
+     * @see <a href="https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Bukkit.html#selectEntities(org.bukkit.command.CommandSender,java.lang.String)">Bukkit.selectEntities(CommandSender, String)</a>
      */
     void resetBySelector(CommandSender sender, String selector) throws IllegalArgumentException;
 

@@ -18,7 +18,10 @@
 
 package me.jerryhan3.statCleaner.internal.command;
 
+import me.jerryhan3.statCleaner.api.ResetCategory;
+import me.jerryhan3.statCleaner.api.StatCleanerApi;
 import me.jerryhan3.statCleaner.internal.utils.VersionDetector;
+import org.bukkit.Bukkit;
 import org.bukkit.attribute.Attributable;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
@@ -41,8 +44,10 @@ import static me.jerryhan3.statCleaner.internal.utils.VersionDetector.isVersionA
 
 public class CommandReset implements CommandExecutor {
     private final StatCleaner parent;
+    public final StatCleanerApiImpl statCleanerApi;
     public CommandReset(StatCleaner parent) {
         this.parent = parent;
+        this.statCleanerApi = new StatCleanerApiImpl();
     }
     /**
      * Execute when command `/statreset` is performed.
@@ -135,7 +140,7 @@ public class CommandReset implements CommandExecutor {
         return isPartialFailed;
     }
 
-    private void resetHealth(Player target) {
+    protected void resetHealth(Player target) {
         if (isVersionAtLeast(1,9)) {
             AttributeInstance targetMaxHealth = target.getAttribute(Attribute.GENERIC_MAX_HEALTH);
             if (targetMaxHealth != null) {
@@ -220,8 +225,8 @@ public class CommandReset implements CommandExecutor {
     }
 
     /**
-     * Set an attribute back to the default value.
-     * Known issue: Players' `MOVEMENT_SPEED`'s default value is wrong. Should be 0.1, but 0.7.
+     * Set an attribute back to the default value. <br>
+     * Known issue: Players' <code>MOVEMENT_SPEED</code>'s default value is wrong. Should be 0.1, but 0.7.
      * @param target targeted Attributable instance.
      * @param name Attribute's name to reset.
      * */
@@ -235,6 +240,108 @@ public class CommandReset implements CommandExecutor {
         else {
             parent.getLogger().info("Attribute " + name + "doesn't exist on current version. Ignored.");
             throw new IllegalArgumentException("");
+        }
+    }
+
+    protected final class StatCleanerApiImpl implements StatCleanerApi {
+        /**
+         * Reset a single player's stats. <br>
+         * The behavior is controlled by the config of StatCleaner.
+         *
+         * @param player a Bukkit Player object.
+         */
+        @Override
+        public void resetPlayer(Player player) {
+            CommandReset.this.resetStat(player);
+        }
+
+        /**
+         * Reset multiple players' stats. <br>
+         * The behavior is controlled by the config of StatCleaner.
+         *
+         * @param players a list of Bukkit Player objects.
+         */
+        @Override
+        public void resetPlayers(List<Player> players) {
+            for (Player player: players) {resetPlayer(player);}
+        }
+
+        /**
+         * Reset players' stats if they match the entity selector provided.
+         *
+         * @param sender   Command sender, which will work together with entity selector to parse targets.
+         * @param selector a string that contains a vanilla entity selector, like <code>@a</code>.
+         * @throws IllegalArgumentException if the selector is malformed in any way or a parameter is null.
+         * @see <a href="https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Bukkit.html#selectEntities(org.bukkit.command.CommandSender,java.lang.String)">Bukkit.selectEntities(CommandSender, String)</a>
+         */
+        @Override
+        public void resetBySelector(CommandSender sender, String selector) throws IllegalArgumentException {
+            if (Objects.equals(selector, "@s") && !(sender instanceof Player)) {
+                parent.getLogger().log(Level.WARNING, "A command block or the console is attempting to reset their stat!");
+                sender.sendMessage(parent.getMessageManager().getMessages("error.target-wrong-type"));
+                throw new IllegalArgumentException("A command block or the console is attempting to reset their stat!");
+            }
+            else if (selector.startsWith("@e") || selector.startsWith("@n")) {
+                parent.getLogger().log(Level.WARNING, "Entity selector will not affect on non-player entities! ");
+                sender.sendMessage(parent.getMessageManager().getMessages("warn.entity-selector"));
+            }
+            List<Player> targets = SelectorParser.parsePlayers(sender, selector);
+            resetPlayers(targets);
+        }
+
+        /**
+         * Check the status of a certain stat category, and determine if the player's certain stat will be reset.
+         *
+         * @param category Choose from <code>HEALTH</code>, <code>HUNGER</code>, <code>EFFECTS</code>, <code>ATTRIBUTES</code>, and <code>FLYING</code>.
+         * @return Whether the category is enabled.
+         */
+        @Override
+        public boolean isCategoryEnabled(ResetCategory category) {
+            switch (category) {
+                case HEALTH -> {
+                    return CommandReset.this.parent.getConfig().getBoolean("reset.health");
+                }
+                case HUNGER -> {
+                    return CommandReset.this.parent.getConfig().getBoolean("reset.food");
+                }
+                case EFFECTS -> {
+                    return CommandReset.this.parent.getConfig().getBoolean("reset.effect");
+                }
+                case ATTRIBUTES -> {
+                    return CommandReset.this.parent.getConfig().getBoolean("reset.attribute");
+                }
+                case FLYING -> {
+                    return CommandReset.this.parent.getConfig().getBoolean("reset.fly");
+                }
+                default -> {
+                    return false;
+                }
+            }
+        }
+
+        /**
+         * Reset a single player's certain category of stat.
+         *
+         * @param player   Target Bukkit Player object.
+         * @param category Target stat category to reset.
+         */
+        @Override
+        public void resetPlayerByCategory(Player player, ResetCategory category) {
+            switch (category) {
+                case FLYING -> CommandReset.this.stopFlying(player);
+                case ATTRIBUTES -> CommandReset.this.resetAttributes(player);
+                case EFFECTS -> CommandReset.this.clearEffects(player);
+                case HUNGER -> CommandReset.this.resetHunger(player);
+                case HEALTH -> CommandReset.this.resetHealth(player);
+            }
+        }
+
+        /**
+         * Get Statreset plugin's version.
+         */
+        @Override
+        public String getVersion() {
+            return CommandReset.this.parent.getDescription().getVersion();
         }
     }
 }
